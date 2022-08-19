@@ -7,6 +7,7 @@ from project.setup.db import db
 from project.views.auth import auth_ns, user_ns
 from project.views.main import directors_ns, genres_ns, movies_ns
 
+
 def base_service_error_handler(exception: BaseServiceError):
     return jsonify({'error': str(exception)}), exception.code
 

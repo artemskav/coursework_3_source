@@ -1,7 +1,7 @@
 from flask_restx import Namespace, Resource
 
 from project.container import director_service
-from project.setup.api.models import movie, director
+from project.setup.api.models import director
 from project.setup.api.parsers import page_parser
 
 api = Namespace('directors')
@@ -10,7 +10,7 @@ api = Namespace('directors')
 @api.route('/')
 class DirectorsView(Resource):
     @api.expect(page_parser)
-    @api.marshal_with(movie, as_list=True, code=200, description='OK')
+    @api.marshal_with(director, as_list=True, code=200, description='OK')
     def get(self):
         """
         Get all directors.
@@ -22,8 +22,8 @@ class DirectorsView(Resource):
 class DirectorView(Resource):
     @api.response(404, 'Not Found')
     @api.marshal_with(director, code=200, description='OK')
-    def get(self, movie_id: int):
+    def get(self, director_id: int):
         """
-        Get movie by id.
+        Get director by id.
         """
-        return director_service.get_item(movie_id)
+        return director_service.get_item(director_id)

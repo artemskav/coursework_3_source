@@ -12,4 +12,9 @@ def shell():
         "Genre": Genre,
         "Director": Director,
         "Movie": Movie,
+        "User": User
     }
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

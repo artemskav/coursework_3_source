@@ -6,5 +6,5 @@ __all__ = [
     'genres_ns',
     'user_ns',
     'directors_ns',
-    'movies_ns'
+    'movies_ns',
 ]

@@ -1,3 +1,4 @@
+from flask import request
 from flask_restx import Namespace, Resource
 
 from project.container import movie_service
@@ -12,10 +13,10 @@ class MoviesView(Resource):
     @api.expect(page_parser)
     @api.marshal_with(movie, as_list=True, code=200, description='OK')
     def get(self):
-        """
-        Get all movies.
-        """
-        return movie_service.get_all(**page_parser.parse_args())
+        """       Get all movies.        """
+
+        status = request.args.get('status')
+        return movie_service.get_all(filter=status, **page_parser.parse_args())
 
 
 @api.route('/<int:movie_id>/')
