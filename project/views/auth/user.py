@@ -5,6 +5,8 @@ from project.container import user_service
 from project.setup.api.parsers import page_parser
 
 from project.setup.api.models import user
+from project.tools.decorators import auth_required
+from project.tools.security import user_token_by_email
 
 api = Namespace('user')
 
@@ -17,35 +19,22 @@ class RegisterView(Resource):
         return user_service.get_all(**page_parser.parse_args())
 
 
-    @api.marshal_with(user, as_list=True, code=200, description='OK')
+#    @api.marshal_with(user, as_list=True, code=200, description='OK')
+    @auth_required
     def patch(self):
         """        Change data of user.        """
+        token = request.headers["Authorization"].split("Bearer ")[-1]
+        user_up = request.json
+        email = user_token_by_email(token)
+        return user_service.update_user(email, user_up), 201
 
-        data = request.json
-        user.name = data.get('name')
-        user.surname = data.get('surname')
-        user.favorite_genre = data.get('favorite_genre')
-        return user_service.update(user), 201
-
-@api.route('/login')
-class LoginView(Resource):
-    @api.response(404, 'Not Found')
-    @api.marshal_with(user, code=200, description='OK')
-    def post(self):
-        """        Login of user.        """
-
-        data = request.json
-        if email := data.get('email'):
-            if password := data.get('password'):
-                return user_service.check(email, password), 201
-        return "no Ok", 401
-
+@api.route('/password/')
+class ChangepasswView(Resource):
+    @auth_required
     def put(self):
         """        Login of user.        """
-
-        data = request.json
-        if access_token := data.get('access_token'):
-            if refresh_token := data.get('refresh_token'):
-                return user_service.update_token(access_token, refresh_token), 201
-        return "no Ok", 401
-
+        token = request.headers["Authorization"].split("Bearer ")[-1]
+        data_passwords = request.json
+        if data_passwords:
+            return user_service.update_password(token, data_passwords), 201
+        return "Нет пароля", 401

@@ -52,15 +52,33 @@ def generate_tokens(email, password_hash, password, is_refresh=False):
 def approve_refresh_token(refresh_token):
     data = jwt.decode(jwt=refresh_token, key=current_app.config['SECRET_KEY'],
                       algorithms=current_app.config['ALGORITHM'])
-    username = data.get("username")
+    email = data.get("email")
 
-    return generate_tokens(username, None, is_refresh=True)
+    return generate_tokens(email, None, None, is_refresh=True)
 
 
 def compare_password(pwd_on_test, pwd_by_bd) -> bool:
-    decoded_digest = base64.b64decode(pwd_on_test)
+    decoded_digest = base64.b64decode(pwd_by_bd)
 
-    hash_digest = hashlib.pbkdf2_hmac('sha256', pwd_by_bd.encode('utf-8'),
+    hash_digest = hashlib.pbkdf2_hmac('sha256', pwd_on_test.encode('utf-8'),
                                       current_app.config['PWD_HASH_SALT'],
-                                      current_app.config['PWD_HASH_ITERATIONS'] )
+                                      current_app.config['PWD_HASH_ITERATIONS'])
     return hmac.compare_digest(decoded_digest, hash_digest)
+
+
+def user_token_by_email(refresh_token):
+    """ Получение email из токена  """
+    data = jwt.decode(jwt=refresh_token, key=current_app.config['SECRET_KEY'],
+                      algorithms=current_app.config['ALGORITHM'])
+    return data.get("email")
+
+def get_passw_from_token(token):
+    """ Получение пароля из токена  """
+    data = jwt.decode(jwt=token, key=current_app.config['SECRET_KEY'],
+                      algorithms=current_app.config['ALGORITHM'])
+    return data.get("password")
+
+def compare_password2(token, data_passwords) -> bool:
+    """ Сравнение паролей для изменения пароля  """
+    if get_passw_from_token(token) == data_passwords.get("password_1"):
+        return True

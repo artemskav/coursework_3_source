@@ -51,3 +51,33 @@ class UsersDAO(BaseDAO[User]):
         user = self._db_session.query(self.__model__).filter(self.__model__.email == email).one()
         return user
 
+    def update_user(self, email, data):
+        """ Обновление данных по юзеру """
+        user = self._db_session.query(self.__model__).filter(self.__model__.email == email).one()
+        user.name = data.get('name')
+        user.surname = data.get('surname')
+        user.favorite_genre = data.get('favorite_genre')
+
+        try:
+            self._db_session.add(user)
+            self._db_session.commit()
+            print("++")
+        except Exception as e:
+            self._db_session.rollback()
+            print(e)
+            return [], 401
+        return " ", 201
+
+    def update_password(self, email, data_passwords):
+        user = self._db_session.query(self.__model__).filter(self.__model__.email == email).one()
+        user.password = generate_password_hash(data_passwords.get('password_2'))
+        try:
+            self._db_session.add(user)
+            self._db_session.commit()
+            print("++")
+        except Exception as e:
+            self._db_session.rollback()
+            print(e)
+            return [], 401
+        return " ", 201
+
